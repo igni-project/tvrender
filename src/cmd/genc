@@ -1,0 +1,4 @@
+#!/bin/sh
+
+gengetopt --unnamed-opts -i opt.ggo
+

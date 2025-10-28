@@ -1,0 +1,7 @@
+package "TVrender"
+version "0.1"
+purpose "Render engine"
+
+option "domain" d "Absolute path of server socket" string required
+option "verbose" v "Print additional debug information" flag off
+

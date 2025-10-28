@@ -1,0 +1,4 @@
+#!/bin/sh
+
+cd src/gl && glad --reproducible --api gl:core=3.3,gles2/gl=2,gles2 --out-path .
+
