@@ -1,6 +1,6 @@
 # TVrender
 
-TVrender is a socket operated render engine. It produces graphics as instructed by it's clients.
+TVrender is a socket operated render engine. It produces graphics as instructed by its clients.
 
 # Building and installation
 
