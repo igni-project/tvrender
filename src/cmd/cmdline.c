@@ -25,7 +25,7 @@
 
 #include "cmdline.h"
 
-const char *gengetopt_args_info_purpose = "Render engine";
+const char *gengetopt_args_info_purpose = "Socket operated render engine";
 
 const char *gengetopt_args_info_usage = "Usage: TVrender [OPTION]... [FILE]...";
 
