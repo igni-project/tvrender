@@ -33,8 +33,6 @@ int gfxenv_create_vertex_buffer_gl(
 		return -1;
 	}
 
-	printf("Vertex buffers @ %p\n", gls->vertex_buffers);
-
 	/* Extend array */
 	if (gls->vertex_buffer_count >= gls->vertex_buffer_lim)
 	{

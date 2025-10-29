@@ -135,7 +135,6 @@ int gfxenv_material_bind_texture_gl(
 	case TVR_PASS_ALBEDO:
 		gls->mats[mat_idx].has_albedo = 1;
 		gls->mats[mat_idx].albedo_id = msg.tex_id;
-		printf("albedo id %i\n", msg.tex_id);
 		break;
 	default:
 		db_print_vb("invalid pass number (%i)\n", msg.pass);
@@ -259,42 +258,4 @@ int gfxenv_destroy_material_gl(
 
 	return 0;
 }
-
-/*
-int gfxenv_material_rebind_gl(
-	struct gl_scene *gls,
-	int idx
-)
-{
-	int i;
-	struct gl_material *mat;
-	int mesh_idx;
-
-	mat = &gls->mats[idx];
-
-	printf("rebind material\n");
-	printf("bound msh count: %i\n", mat->bound_mesh_count);
-
-	i = 0;
-	while (i < mat->bound_mesh_count)
-	{
-		mesh_idx = search_id(
-			gls->mesh_ids,
-			gls->mesh_count,
-			mat->bound_mesh_ids[i]
-		);
-
-		if (mesh_idx == -1)
-		{
-			db_print_vb("Failed to find mesh bound to material\n");
-		}
-
-		gls->meshes[mesh_idx].albedo = mat->albedo;
-
-		++i;
-	}
-
-	return 0;
-}
-*/
 
