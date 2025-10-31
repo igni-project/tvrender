@@ -39,7 +39,10 @@ int gfxenv_create_vertex_buffer_gl(
 		gls->vertex_buffer_lim *= 2;
 
 		/* Reallocate buffer array */
-		new_addr = realloc(gls->vertex_buffers, gls->vertex_buffer_lim);
+		new_addr = realloc(
+			gls->vertex_buffers,
+			gls->vertex_buffer_lim * sizeof(struct gl_buffer)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffers");
@@ -49,7 +52,10 @@ int gfxenv_create_vertex_buffer_gl(
 		gls->vertex_buffers = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->vertex_buffer_ids, gls->vertex_buffer_lim);
+		new_addr = realloc(
+			gls->vertex_buffer_ids,
+			gls->vertex_buffer_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffer IDs");
@@ -189,7 +195,10 @@ int gfxenv_destroy_vertex_buffer_gl(
 		gls->vertex_buffer_lim /= 2;
 
 		/* Reallocate buffer array */
-		new_addr = realloc(gls->vertex_buffers, gls->vertex_buffer_lim);
+		new_addr = realloc(
+			gls->vertex_buffers,
+			gls->vertex_buffer_lim * sizeof(struct gl_buffer)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffers");
@@ -199,7 +208,10 @@ int gfxenv_destroy_vertex_buffer_gl(
 		gls->vertex_buffers = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->vertex_buffer_ids, gls->vertex_buffer_lim);
+		new_addr = realloc(
+			gls->vertex_buffer_ids,
+			gls->vertex_buffer_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffer IDs");

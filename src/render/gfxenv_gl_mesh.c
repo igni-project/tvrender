@@ -39,8 +39,8 @@ int gfxenv_create_mesh_gl(
 	{
 		gls->mesh_lim *= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(gls->meshes, gls->mesh_lim);
+		/* Reallocate mesh array */
+		new_addr = realloc(gls->meshes, gls->mesh_lim * sizeof(struct gl_mesh));
 		if (!new_addr)
 		{
 			perror("could not allocate memory for meshes");
@@ -50,7 +50,7 @@ int gfxenv_create_mesh_gl(
 		gls->meshes = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->mesh_ids, gls->mesh_lim);
+		new_addr = realloc(gls->mesh_ids, gls->mesh_lim * sizeof(int));
 		if (!new_addr)
 		{
 			perror("could not allocate memory for mesh IDs");
@@ -107,8 +107,11 @@ int gfxenv_create_mesh_gl(
 	{
 		vb->bound_mesh_lim *= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(vb->bound_mesh_ids, vb->bound_mesh_lim);
+		/* Reallocate bound mesh ID array */
+		new_addr = realloc(
+			vb->bound_mesh_ids,
+			vb->bound_mesh_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vb bound mesh IDs");
@@ -127,8 +130,11 @@ int gfxenv_create_mesh_gl(
 	{
 		ib->bound_mesh_lim *= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(ib->bound_mesh_ids, ib->bound_mesh_lim);
+		/* Reallocate bound mesh ID array */
+		new_addr = realloc(
+			ib->bound_mesh_ids,
+			ib->bound_mesh_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for ib bound mesh IDs");
@@ -296,7 +302,10 @@ int gfxenv_mesh_bind_mat_manual_gl(
 			alb->bound_mesh_lim *= 2;
 
 			/* Reallocate bound mesh ID array */
-			new_addr = realloc(alb->bound_mesh_ids, alb->bound_mesh_lim);
+			new_addr = realloc(
+				alb->bound_mesh_ids,
+				alb->bound_mesh_lim * sizeof(int)
+			);
 			if (!new_addr)
 			{
 				perror("could not allocate memory for tex->mesh bind IDs");
@@ -517,8 +526,11 @@ int gfxenv_destroy_mesh_gl(
 	{
 		gls->mesh_lim /= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(gls->meshes, gls->mesh_lim);
+		/* Reallocate mesh array */
+		new_addr = realloc(
+			gls->meshes,
+			gls->mesh_lim * sizeof(struct gl_mesh)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffers");
@@ -528,7 +540,10 @@ int gfxenv_destroy_mesh_gl(
 		gls->meshes = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->mesh_ids, gls->mesh_lim);
+		new_addr = realloc(
+			gls->mesh_ids,
+			gls->mesh_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffer IDs");
@@ -574,8 +589,11 @@ int gfxenv_remove_mesh_manual_gl(
 	{
 		gls->mesh_lim /= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(gls->meshes, gls->mesh_lim);
+		/* Reallocate mesh array */
+		new_addr = realloc(
+			gls->meshes,
+			gls->mesh_lim * sizeof(struct gl_mesh)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffers");
@@ -585,7 +603,10 @@ int gfxenv_remove_mesh_manual_gl(
 		gls->meshes = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->mesh_ids, gls->mesh_lim);
+		new_addr = realloc(
+			gls->mesh_ids,
+			gls->mesh_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for vertex buffer IDs");

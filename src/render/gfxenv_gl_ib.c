@@ -39,7 +39,10 @@ int gfxenv_create_index_buffer_gl(
 		gls->index_buffer_lim *= 2;
 
 		/* Reallocate buffer array */
-		new_addr = realloc(gls->index_buffers, gls->index_buffer_lim);
+		new_addr = realloc(
+			gls->index_buffers,
+			gls->index_buffer_lim * sizeof(struct gl_buffer)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for index buffer array");
@@ -49,7 +52,10 @@ int gfxenv_create_index_buffer_gl(
 		gls->index_buffers = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->index_buffer_ids, gls->index_buffer_lim);
+		new_addr = realloc(
+			gls->index_buffer_ids,
+			gls->index_buffer_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for index buffer IDs");
@@ -190,7 +196,10 @@ int gfxenv_destroy_index_buffer_gl(
 		gls->index_buffer_lim /= 2;
 
 		/* Reallocate buffer array */
-		new_addr = realloc(gls->index_buffers, gls->index_buffer_lim);
+		new_addr = realloc(
+			gls->index_buffers,
+			gls->index_buffer_lim * sizeof(struct gl_buffer)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for index buffers");
@@ -200,7 +209,10 @@ int gfxenv_destroy_index_buffer_gl(
 		gls->index_buffers = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->index_buffer_ids, gls->index_buffer_lim);
+		new_addr = realloc(
+			gls->index_buffer_ids,
+			gls->index_buffer_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for index buffer IDs");

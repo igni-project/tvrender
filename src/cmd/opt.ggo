@@ -1,5 +1,5 @@
 package "TVrender"
-version "0.1"
+version "0.1.1"
 purpose "Socket operated render engine"
 
 option "domain" d "Absolute path of server socket" string required

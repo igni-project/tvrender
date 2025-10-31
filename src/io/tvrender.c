@@ -74,7 +74,12 @@ int recv_tvr_vertex_buffer_create(
 
 	while (vb_recv_offset < msg->size)
 	{
-		recv_status = recv(fd, msg->data + vb_recv_offset, msg->size, 0);
+		recv_status = recv(
+			fd,
+			msg->data + vb_recv_offset,
+			msg->size - vb_recv_offset,
+			0
+		);
 
 		if (recv_status <= 0)
 		{
@@ -155,7 +160,12 @@ int recv_tvr_index_buffer_create(
 
 	while (ib_recv_offset < msg->size)
 	{
-		recv_status = recv(fd, msg->data + ib_recv_offset, msg->size, 0);
+		recv_status = recv(
+			fd,
+			msg->data + ib_recv_offset,
+			msg->size - ib_recv_offset,
+			0
+		);
 
 		if (recv_status <= 0)
 		{
@@ -538,7 +548,12 @@ int recv_tvr_texture_create(
 
 	while (tex_recv_offset < tex_size)
 	{
-		recv_status = recv(fd, msg->data + tex_recv_offset, tex_size, 0);
+		recv_status = recv(
+			fd,
+			msg->data + tex_recv_offset,
+			tex_size - tex_recv_offset,
+			0
+		);
 
 		if (recv_status <= 0)
 		{

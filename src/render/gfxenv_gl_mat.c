@@ -50,7 +50,7 @@ int gfxenv_create_material_gl(
 
 		/* Reallocate ID array */
 		new_addr = realloc(
-				gls->mat_ids, gls->mat_lim * sizeof(struct gl_material));
+				gls->mat_ids, gls->mat_lim * sizeof(int));
 
 		if (!new_addr)
 		{
@@ -148,7 +148,10 @@ int gfxenv_material_bind_texture_gl(
 		tex->mat_bind_lim *= 2;
 
 		/* Reallocate bound material ID array */
-		new_addr = realloc(tex->bound_mat_ids, tex->mat_bind_lim);
+		new_addr = realloc(
+			tex->bound_mat_ids,
+			tex->mat_bind_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for tex->mat bind IDs");
@@ -158,7 +161,10 @@ int gfxenv_material_bind_texture_gl(
 		tex->bound_mat_ids = new_addr;
 
 		/* Reallocate bound render pass array */
-		new_addr = realloc(tex->bound_passes, tex->mat_bind_lim);
+		new_addr = realloc(
+			tex->bound_passes,
+			tex->mat_bind_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for list of render passes");
@@ -245,7 +251,7 @@ int gfxenv_destroy_material_gl(
 
 		/* Reallocate ID array */
 		new_addr = realloc(
-				gls->mat_ids, gls->mat_lim * sizeof(struct gl_material));
+				gls->mat_ids, gls->mat_lim * sizeof(int));
 
 		if (!new_addr)
 		{

@@ -36,8 +36,11 @@ int gfxenv_create_texture_gl(
 	{
 		gls->texture_lim *= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(gls->textures, gls->texture_lim);
+		/* Reallocate texture array */
+		new_addr = realloc(
+			gls->textures,
+			gls->texture_lim * sizeof(struct gl_texture)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for textures");
@@ -47,7 +50,10 @@ int gfxenv_create_texture_gl(
 		gls->textures = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->texture_ids, gls->texture_lim);
+		new_addr = realloc(
+			gls->texture_ids,
+			gls->texture_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for texture IDs");
@@ -281,8 +287,11 @@ int gfxenv_destroy_texture_gl(
 	{
 		gls->texture_lim /= 2;
 
-		/* Reallocate buffer array */
-		new_addr = realloc(gls->textures, gls->texture_lim);
+		/* Reallocate texture array */
+		new_addr = realloc(
+			gls->textures,
+			gls->texture_lim * sizeof(struct gl_texture)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for textures");
@@ -292,7 +301,10 @@ int gfxenv_destroy_texture_gl(
 		gls->textures = new_addr;
 
 		/* Reallocate ID array */
-		new_addr = realloc(gls->texture_ids, gls->texture_lim);
+		new_addr = realloc(
+			gls->texture_ids,
+			gls->texture_lim * sizeof(int)
+		);
 		if (!new_addr)
 		{
 			perror("could not allocate memory for texture IDs");
