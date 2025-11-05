@@ -67,7 +67,21 @@ int main(int argc, char **argv, char **envp)
 	if (srv_fd == -1)
 	{
 		perror("Failed to create server socket");
-		return -1;
+		exit(EXIT_FAILURE);
+	}
+
+	/* By default, set the 'domain' argument to the environment variable
+	 * 'TVR_DISPLAY' */
+	if (!args_info.domain_given)
+	{
+		args_info.domain_arg = getenv("TVR_DISPLAY");
+	}
+
+	/* Thow an error if getenv has an error */
+	if (!args_info.domain_arg)
+	{
+		printf("Could not find environment var 'TVR_DISPLAY'.\n");
+		exit(EXIT_FAILURE);
 	}
 
 	sv_addr.sun_family = AF_UNIX;
@@ -75,13 +89,13 @@ int main(int argc, char **argv, char **envp)
 	if (bind(srv_fd, (struct sockaddr*)&sv_addr, sizeof(sv_addr)) == -1)
 	{
 		perror("Failed to bind server socket");
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	if (listen(srv_fd, 10) == -1)
 	{
 		perror("Failed to open server socket for listening");
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	/* Start child processes */
@@ -114,7 +128,7 @@ int main(int argc, char **argv, char **envp)
 	if (glfwInit() == GLFW_FALSE)
 	{
 		printf("Failed to initialise GLFW\n");
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -127,14 +141,14 @@ int main(int argc, char **argv, char **envp)
 	{
 		printf("Failed to create window\n");
 		glfwTerminate();
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	glfwMakeContextCurrent(window);
 
 	if (create_gfxenv(&gfxenv, window) == -1)
 	{
-		return -1;
+		exit(EXIT_FAILURE);
 	}
 
 	/* The file descriptor of the server socket is higher than all zero of the

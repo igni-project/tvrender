@@ -11,22 +11,24 @@ add_link_options(-fsanitize=address)
 
 add_executable(
 	tvrender
-	src/main.c
-	src/debug/print.c
 	src/cmd/cmdline.c
-	src/io/tvrender.c
-	src/render/opengl2.c
-	src/render/gfxenv_gl.c
-	src/render/gfxenv_gl_vb.c
-	src/render/gfxenv_gl_ib.c
-	src/render/gfxenv_gl_mesh.c
-	src/render/gfxenv_gl_tex.c
-	src/render/gfxenv_gl_mat.c
-	src/render/gfxenv_gl_pov.c
-	src/render/gfxenv.c
-	src/render/rflag.c
-	src/gl/src/gl.c
 	src/common/id.c
+	src/debug/print.c
+	src/gl/src/gl.c
+	src/io/tvr1.c
+	src/io/tvr2.c
+	src/io/tvrender.c
+	src/main.c
+	src/render/gfxenv.c
+	src/render/gfxenv_gl.c
+	src/render/gfxenv_gl_ib.c
+	src/render/gfxenv_gl_mat.c
+	src/render/gfxenv_gl_mesh.c
+	src/render/gfxenv_gl_pov.c
+	src/render/gfxenv_gl_tex.c
+	src/render/gfxenv_gl_vb.c
+	src/render/opengl2.c
+	src/render/rflag.c
 )
 
 target_include_directories(
