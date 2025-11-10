@@ -16,7 +16,7 @@ int (*p_gfxenv_exec)(struct gfxenv *, unsigned int) = &gfxenv_exec_na;
 
 int create_gfxenv(struct gfxenv *gfxenv, GLFWwindow *window)
 {
-	gfxenv->scenes = malloc(sizeof(int));
+	gfxenv->scenes = malloc(sizeof(struct gfxenv_scene));
 	gfxenv->scene_count = 0;
 	gfxenv->scene_limit = 1;
 
@@ -69,6 +69,8 @@ int gfxenv_new_client_na(struct gfxenv *gfxenv, int fd)
 	}
 
 	gfxenv->scenes[gfxenv->scene_count].fd = fd;
+	gfxenv->scenes[gfxenv->scene_count].tvr_ver = 0;
+
 
 	++gfxenv->scene_count;
 
@@ -124,14 +126,22 @@ int gfxenv_exec_na(struct gfxenv *gfxenv, unsigned int scene)
 	return -1;
 }
 
-/* This function will do more when later versions of the TVrender protocol
- * are made. */
 int gfxenv_set_tvr_version(struct gfxenv *gfxenv, unsigned int scene)
 {
 	struct tvr_msg_set_version msg;
 
 	db_print_vb("\033[1mNew request\033[0m (set protocol version)\n");
 
-	return recv_tvr_set_version(gfxenv->scenes[scene].fd, &msg);
+	if (recv_tvr_set_version(
+			gfxenv->scenes[scene].fd,
+			&msg) == -1)
+	{ 
+		db_print_vb("failed to recieve message.\n"); 
+		return -1; 
+	} 
+ 
+	gfxenv->scenes[scene].tvr_ver = msg.version; 
+ 
+	return 0;
 }
 
