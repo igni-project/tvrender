@@ -1,10 +1,78 @@
 #include "tvrender.h"
+#include "tvr1.h"
+#include "tvr2.h"
 #include "../debug/print.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/socket.h>
+
+
+/* Translate versioned TVrender opcode to internal opcode */
+
+int tvr_int_opcode(
+	uint16_t opcode,
+	int tvr_v,
+	uint16_t *int_opcode
+)
+{
+	/* Each version has a unique table of opcodes. */
+	switch (tvr_v)
+	{
+	case 0:
+		if (opcode != 0)
+		{
+			printf(
+				"'set version' (0) is the only supported TVrender v0 opcode.\n"
+			);
+
+			return -1;
+		}
+
+		*int_opcode = TVR_INT_OPC_SET_VERSION;
+		return 0;
+
+	case 1:
+		if (opcode >= tvr1_opcode_count)
+		{
+			printf(
+				"Opcode (%i) out of range (0-%i).\n",
+				opcode,
+				tvr1_opcode_count
+			);
+
+			return -1;
+		}
+
+		*int_opcode = tvr1_opcodes[opcode];
+		return 0;
+
+	case 2:
+		if (opcode >= tvr2_opcode_count)
+		{
+			printf(
+				"Opcode (%i) out of range (0-%i).\n",
+				opcode,
+				tvr2_opcode_count
+			);
+
+			return -1;
+		}
+
+		*int_opcode = tvr2_opcodes[opcode];
+		return 0;
+
+	default:
+		printf(
+			"Opcode not found: TVrender protocol version %i is unsupported.\n",
+			tvr_v
+		);
+		return -1;
+	}
+
+	return 0;
+}
 
 int recv_tvr_set_version(
 	int fd,
@@ -280,6 +348,40 @@ int recv_tvr_mesh_bind_mat(
 	}
 
 	db_print_vb("| Material ID: %i\n", msg->mat_id);
+
+	return 0;
+}
+
+int recv_tvr_mesh_bind_tex(
+	int fd,
+	struct tvr_msg_mesh_bind_tex *msg
+)
+{
+	int recv_status;
+		
+	db_print_vb("| Client ID: %i\n", fd);
+
+	/* Field: mesh ID (32-bit) */
+	recv_status = recv(fd, &msg->mesh_id, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive mesh ID");
+		return -1;
+	}
+
+	db_print_vb("| Mesh ID: %i\n", msg->mesh_id);
+
+	/* Field: texture ID (32-bit) */
+	recv_status = recv(fd, &msg->tex_id, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive texture ID");
+		return -1;
+	}
+
+	db_print_vb("| Texture ID: %i\n", msg->tex_id);
 
 	return 0;
 }
@@ -567,6 +669,114 @@ int recv_tvr_texture_create(
 	return 0;
 }
 
+int recv_tvr_texture_write(
+	int fd,
+	struct tvr_msg_texture_write *msg
+)
+{
+	int recv_status;
+	size_t image_size;
+	uintptr_t tex_recv_offset = 0;
+		
+	db_print_vb("| Client ID: %i\n", fd);
+
+	/* Field: texture ID (32-bit) */
+	recv_status = recv(fd, &msg->tex_id, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive texture ID");
+		return -1;
+	}
+
+	db_print_vb("| Texture ID: %i\n", msg->tex_id);
+
+	/* Field: X coordinate (unsigned 32-bit int) */
+	recv_status = recv(fd, &msg->x, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive X coordinate");
+		return -1;
+	}
+
+	db_print_vb("| start X coord: %i\n", msg->x);
+
+	/* Field: Y coordinate (unsigned 32-bit int) */
+	recv_status = recv(fd, &msg->y, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive Y coordinate");
+		return -1;
+	}
+
+	db_print_vb("| start Y coord: %i\n", msg->y);
+
+	/* Field: width (unsigned 32-bit int) */
+	recv_status = recv(fd, &msg->w, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive width");
+		return -1;
+	}
+
+	db_print_vb("| width: %i\n", msg->w);
+
+	/* Field: height (unsigned 32-bit int) */
+	recv_status = recv(fd, &msg->h, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive height");
+		return -1;
+	}
+
+	db_print_vb("| height: %i\n", msg->h);
+
+	/* Field: texture bit depth (unsigned 8-bit int) */
+	recv_status = recv(fd, &msg->channels, 8, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive texture bit depth");
+		return -1;
+	}
+
+	db_print_vb("| texture bit depth: %i\n", msg->channels);
+
+	image_size = msg->w * msg->h * msg->channels;
+
+	/* Texture data */
+	msg->data = malloc(image_size);
+	if (!msg->data)
+	{
+		perror("Failed to allocate space for texture");
+		return -1;
+	}
+
+	while (tex_recv_offset < image_size)
+	{
+		recv_status = recv(
+			fd,
+			msg->data + tex_recv_offset,
+			image_size - tex_recv_offset,
+			0
+		);
+
+		if (recv_status <= 0)
+		{
+			perror("Failed to receive texture data");
+			return -1;
+		}
+
+		tex_recv_offset += recv_status;
+	}
+
+	return 0;
+}
+
 int recv_tvr_texture_destroy(
 	int fd,
 	struct tvr_msg_texture_destroy *msg
@@ -737,6 +947,51 @@ int recv_tvr_pov_set_loc(
 int recv_tvr_pov_set_rot(
 	int fd,
 	struct tvr_msg_pov_set_rot *msg
+)
+{
+	int recv_status;
+		
+	db_print_vb("| Client ID: %i\n", fd);
+
+	/* Field: X coordinate (32-bit float) */
+	recv_status = recv(fd, &msg->x, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive X coordinate");
+		return -1;
+	}
+
+	db_print_vb("| X coord: %f\n", msg->x);
+
+	/* Field: Y coordinate (32-bit float) */
+	recv_status = recv(fd, &msg->y, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive Y coordinate");
+		return -1;
+	}
+
+	db_print_vb("| Y coord: %f\n", msg->y);
+
+	/* Field: Z coordinate (32-bit float) */
+	recv_status = recv(fd, &msg->z, 4, 0);
+
+	if (recv_status <= 0)
+	{
+		perror("Failed to receive Z coordinate");
+		return -1;
+	}
+
+	db_print_vb("| Z coord: %f\n", msg->z);
+
+	return 0;
+}
+
+int recv_tvr_pov_look_at(
+	int fd,
+	struct tvr_msg_pov_look_at *msg
 )
 {
 	int recv_status;

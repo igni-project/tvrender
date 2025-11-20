@@ -140,7 +140,7 @@ int gfxenv_create_texture_gl(
 			msg.data
 	);
 
-    glGenerateMipmap(GL_TEXTURE_2D);
+	glGenerateMipmap(GL_TEXTURE_2D);
 
 	/* Add texture to texture array */
 	gls->texture_ids[gls->texture_count] = msg.tex_id;
@@ -177,7 +177,7 @@ int gfxenv_destroy_texture_gl(
 		return -1;
 	}
 
-	/* Search for index of ID in ID lookup table */
+	/* Search for index of texture ID in ID lookup table */
 
 	idx = search_id(
 		gls->texture_ids,

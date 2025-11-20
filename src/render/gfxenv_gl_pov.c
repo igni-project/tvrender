@@ -114,6 +114,46 @@ int gfxenv_set_pov_rot_gl(
 	return 0;
 }
 
+int gfxenv_pov_look_at_gl(
+	struct gfxenv *gfxenv,
+	unsigned int scene
+)
+{
+	struct tvr_msg_pov_look_at msg;
+	vec3 target = {0};
+
+	if (recv_tvr_pov_look_at(
+			gfxenv->scenes[scene].fd,
+			&msg) == -1)
+	{
+		db_print_vb("failed to recieve message.\n");
+		return -1;
+	}
+
+	db_print_vb("\033[1mNew request\033[0m (POV: look at point)\n");
+
+	target[0]= msg.x;
+	target[1] = msg.y;
+	target[2] = msg.z;
+	
+	glm_lookat(
+		gfxenv->data.gl.pov.loc,
+		target,
+		gfxenv->data.gl.pov.up,
+		gfxenv->data.gl.pov.view
+	);
+	
+	/* Update UBO */
+	glUniformMatrix4fv(
+		gfxenv->data.gl.view_ubo,
+		1,
+		GL_FALSE,
+		(GLfloat*)&gfxenv->data.gl.pov.view
+	);
+
+	return 0;
+}
+
 int gfxenv_set_pov_fov_gl(
 	struct gfxenv *gfxenv,
 	unsigned int scene

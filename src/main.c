@@ -33,7 +33,7 @@ int main(int argc, char **argv, char **envp)
 	int max_fd;
 
 	/* keep main loop going */
-	char shouldClose = 0;
+	char should_close = 0;
 
 	/* Socket activity */
 	int activity;
@@ -56,6 +56,13 @@ int main(int argc, char **argv, char **envp)
 
 	/* Command-line arguments */
 	struct gengetopt_args_info args_info = {};
+
+	/* Arguments of child process(es) */
+	char *child_args[1] = {0};
+
+	/* Process IDs */
+	pid_t pid;
+	pid_t *child_pid;
 
 	/* Parse command line arguments */
 	if (cmdline_parser(argc, argv, &args_info))
@@ -98,6 +105,14 @@ int main(int argc, char **argv, char **envp)
 		exit(EXIT_FAILURE);
 	}
 
+	/* Create child process ID table */
+	child_pid = malloc(args_info.inputs_num * sizeof(pid_t));
+	if (!child_pid)
+	{
+		perror("Failed to allocate space for child process ID table");
+		exit(EXIT_FAILURE);
+	}
+
 	/* Start child processes */
 	i = 0;
 	while (i < args_info.inputs_num)
@@ -107,9 +122,13 @@ int main(int argc, char **argv, char **envp)
 			printf("Executing %s\n", args_info.inputs[i]);
 		}
 
-		if (!fork()) break;
+		pid = fork();
 
-		if (execve(args_info.inputs[i], 0, envp) == -1) {
+		if (!pid) break;
+
+		child_args[0] = args_info.inputs[i];
+
+		if (execve(args_info.inputs[i], child_args, envp) == -1) {
 			printf("Failed to execute ");
 			perror(args_info.inputs[i]);
 			exit(EXIT_FAILURE);
@@ -156,7 +175,7 @@ int main(int argc, char **argv, char **envp)
 	max_fd = srv_fd;
 
 	/* MAIN LOOP */
-	while (!shouldClose)
+	while (!should_close)
 	{
 		/* This code must occur every frame. */
 		FD_ZERO(&read_fds);
@@ -223,7 +242,7 @@ int main(int argc, char **argv, char **envp)
 		}
 
 		glfwPollEvents();
-		shouldClose = glfwWindowShouldClose(window);
+		should_close = glfwWindowShouldClose(window);
 	}
 
 	/* Clean up before exit */
@@ -233,6 +252,9 @@ int main(int argc, char **argv, char **envp)
 		glfwDestroyWindow(window);
 		glfwTerminate();
 	}
+
+	/* AddressSanitizer throws fit at this. Best leave it out. */
+	/*cmdline_parser_free(&args_info);*/
 
 	return 0;
 }

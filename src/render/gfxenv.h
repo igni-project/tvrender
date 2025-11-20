@@ -15,7 +15,8 @@ struct vertex
 struct gfxenv_scene
 {
 	int fd;
-	int sup_version;
+	/* TVrender protocol version */ 
+	int tvr_ver;
 };
 
 struct gfxenv
@@ -218,6 +219,11 @@ int gfxenv_set_pov_loc_gl(
 );
 
 int gfxenv_set_pov_rot_gl(
+	struct gfxenv *gfxenv,
+	unsigned int scene
+);
+
+int gfxenv_pov_look_at_gl(
 	struct gfxenv *gfxenv,
 	unsigned int scene
 );

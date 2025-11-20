@@ -2,12 +2,16 @@ cmake_minimum_required(VERSION 3.15...4.0)
 
 project(
 	tvrender
-	VERSION 0.1.1
+	VERSION 0.1.2
 	LANGUAGES C
 )
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+add_compile_options(
+	"$<$<CONFIG:DEBUG>:-fsanitize=address>"
+)
+add_link_options(
+	"$<$<CONFIG:DEBUG>:-fsanitize=address>"
+)
 
 add_executable(
 	tvrender
@@ -15,8 +19,6 @@ add_executable(
 	src/common/id.c
 	src/debug/print.c
 	src/gl/src/gl.c
-	src/io/tvr1.c
-	src/io/tvr2.c
 	src/io/tvrender.c
 	src/main.c
 	src/render/gfxenv.c

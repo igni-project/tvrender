@@ -324,6 +324,92 @@ int gfxenv_mesh_bind_mat_manual_gl(
 	return 0;
 }
 
+int gfxenv_mesh_bind_texture_gl(
+	struct gfxenv *gfxenv,
+	unsigned int scene
+)
+{
+	void *new_addr;
+	struct gl_scene *gls;
+	struct tvr_msg_mesh_bind_tex msg;
+	int mesh_idx, texture_idx;
+	struct gl_mesh *mesh;
+	struct gl_texture *texture;
+
+	gls = &gfxenv->data.gl.scenes[scene];
+	
+	db_print_vb("\033[1mNew request\033[0m (bind textureerial to mesh)\n");
+	
+	/* Receive incoming message */
+	if (recv_tvr_mesh_bind_tex(
+			gfxenv->scenes[scene].fd, &msg) == -1)
+	{
+		db_print_vb("failed to recieve message.\n");
+		return -1;
+	}
+
+	/* Search for index of mesh ID in ID lookup table */
+	mesh_idx = search_id(
+		gls->mesh_ids,
+		gls->mesh_count,
+		msg.mesh_id
+	);
+
+	if (mesh_idx == -1)
+	{
+		db_print_vb("Failed to find mesh.\n");
+		return -1;
+	}
+
+	mesh = &gls->meshes[mesh_idx];
+
+	/* Search for index of texture ID in ID lookup table */
+	texture_idx = search_id(
+		gls->texture_ids,
+		gls->texture_count,
+		msg.tex_id
+	);
+
+	if (texture_idx == -1)
+	{
+		db_print_vb("Failed to find texture.\n");
+		return -1;
+	}
+
+	texture = &gls->textures[texture_idx];
+
+	/* Albedo is the only pass implemented right now */
+	mesh->albedo = texture->tex;
+
+	/* Log binding in texture */
+
+	if (texture->bound_mesh_count >= texture->bound_mesh_lim)
+	{
+		texture->bound_mesh_lim *= 2;
+
+		/* Reallocate bound mesh ID array */
+		new_addr = realloc(
+			texture->bound_mesh_ids,
+			texture->bound_mesh_lim * sizeof(int)
+		);
+		if (!new_addr)
+		{
+			perror("could not allocate memory for tex->mesh bind IDs");
+			return -1;
+		}
+
+		texture->bound_mesh_ids = new_addr;
+	}
+
+	texture->bound_mesh_passes[texture->bound_mesh_count] = TVR_PASS_ALBEDO;
+	texture->bound_mesh_ids[texture->bound_mesh_count] = gls->mesh_ids[mesh_idx];
+
+	++texture->bound_mesh_count;
+
+
+	return 0;
+}
+
 int gfxenv_mesh_set_loc_gl(
 	struct gfxenv *gfxenv,
 	unsigned int scene

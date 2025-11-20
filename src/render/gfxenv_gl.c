@@ -2,6 +2,7 @@
 #include "opengl.h"
 #include "../debug/print.h"
 #include "../io/tvrender.h"
+#include "../io/tvr_internal.h"
 #include "../common/id.h"
 #include "rflag.h"
 
@@ -328,6 +329,7 @@ int gfxenv_new_client_gl(struct gfxenv *gfxenv, int fd)
 
 
 	gfxenv->scenes[gfxenv->scene_count].fd = fd;
+	gfxenv->scenes[gfxenv->scene_count].tvr_ver = 0;
 
 	/* Initialise the new scene's dynamic arrays */
 
@@ -483,84 +485,96 @@ int gfxenv_exec_gl(struct gfxenv *gfxenv, unsigned int scene)
 		return 0;
 	}
 
+	/* Translate the version-specific incoming opcode to a version-agnostic
+	 * internal opcode */
+	if (tvr_int_opcode(opcode, gfxenv->scenes[scene].tvr_ver, &opcode) == -1)
+	{
+		gfxenv_del_scene_gl(gfxenv, scene);
+		return -1;
+	}
+
 	/* The real core of this function.
 	 * A switch statement covering every TVrender opcode. */
 	switch (opcode)
 	{
-	case TVR_OPCODE_SET_VERSION:
+	case TVR_INT_OPC_SET_VERSION:
 		ret = gfxenv_set_tvr_version(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_VERTEX_BUFFER_CREATE:
+	case TVR_INT_OPC_VERTEX_BUFFER_CREATE:
 		ret = gfxenv_create_vertex_buffer_gl(gfxenv, scene);
 		break;
-	case TVR_OPCODE_VERTEX_BUFFER_DESTROY:
+	case TVR_INT_OPC_VERTEX_BUFFER_DESTROY:
 		ret = gfxenv_destroy_vertex_buffer_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_INDEX_BUFFER_CREATE:
+	case TVR_INT_OPC_INDEX_BUFFER_CREATE:
 		ret = gfxenv_create_index_buffer_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_INDEX_BUFFER_DESTROY:
+	case TVR_INT_OPC_INDEX_BUFFER_DESTROY:
 		ret = gfxenv_destroy_index_buffer_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MESH_CREATE:
+	case TVR_INT_OPC_MESH_CREATE:
 		ret = gfxenv_create_mesh_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MESH_BIND_MAT:
+	case TVR_INT_OPC_MESH_BIND_MAT:
 		ret = gfxenv_mesh_bind_mat_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MESH_SET_LOC:
+	case TVR_INT_OPC_MESH_SET_LOC:
 		ret = gfxenv_mesh_set_loc_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MESH_SET_ROT:
+	case TVR_INT_OPC_MESH_SET_ROT:
 		ret = gfxenv_mesh_set_rot_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MESH_SET_SCALE:
+	case TVR_INT_OPC_MESH_SET_SCALE:
 		ret = gfxenv_mesh_set_scale_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MESH_DESTROY:
+	case TVR_INT_OPC_MESH_DESTROY:
 		ret = gfxenv_destroy_mesh_gl(gfxenv, scene);
 		break;
 
 
-	case TVR_OPCODE_TEXTURE_CREATE:
+	case TVR_INT_OPC_TEXTURE_CREATE:
 		ret = gfxenv_create_texture_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_TEXTURE_DESTROY:
+	case TVR_INT_OPC_TEXTURE_DESTROY:
 		ret = gfxenv_destroy_texture_gl(gfxenv, scene);
 		break;
 
 
-	case TVR_OPCODE_MATERIAL_CREATE:
+	case TVR_INT_OPC_MATERIAL_CREATE:
 		ret = gfxenv_create_material_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MATERIAL_BIND_TEXTURE:
+	case TVR_INT_OPC_MATERIAL_BIND_TEXTURE:
 		ret = gfxenv_material_bind_texture_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_MATERIAL_DESTROY:
+	case TVR_INT_OPC_MATERIAL_DESTROY:
 		ret = gfxenv_destroy_material_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_POV_SET_LOC:
+	case TVR_INT_OPC_POV_SET_LOC:
 		ret = gfxenv_set_pov_loc_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_POV_SET_ROT:
+	case TVR_INT_OPC_POV_SET_ROT:
 		ret = gfxenv_set_pov_rot_gl(gfxenv, scene);
 		break;
 
-	case TVR_OPCODE_POV_SET_FOV:
+	case TVR_INT_OPC_POV_LOOK_AT:
+		ret = gfxenv_pov_look_at_gl(gfxenv, scene);
+		break;
+
+	case TVR_INT_OPC_POV_SET_FOV:
 		ret = gfxenv_set_pov_fov_gl(gfxenv, scene);
 		break;
 
