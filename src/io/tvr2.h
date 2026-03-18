@@ -7,7 +7,7 @@
 
 /* Opcodes */
 
-constexpr uint32_t tvr2_opcodes[] = {
+uint32_t tvr2_opcodes[] = {
 	TVR_INT_OPC_SET_VERSION,
 	TVR_INT_OPC_VERTEX_BUFFER_CREATE,
 	TVR_INT_OPC_VERTEX_BUFFER_DESTROY,
@@ -30,7 +30,7 @@ constexpr uint32_t tvr2_opcodes[] = {
 	TVR_INT_OPC_POV_LOOK_AT,
 	TVR_INT_OPC_POV_SET_FOV
 };
-constexpr unsigned int tvr2_opcode_count = 21;
+unsigned int tvr2_opcode_count = 21;
 
 #endif
 

@@ -143,7 +143,7 @@ int main(int argc, char **argv, char **envp)
 		db_verbose_enable();
 	}
 
-	/* Create graphical environment */
+	/* Create window */
 	if (glfwInit() == GLFW_FALSE)
 	{
 		printf("Failed to initialise GLFW\n");
@@ -165,6 +165,7 @@ int main(int argc, char **argv, char **envp)
 
 	glfwMakeContextCurrent(window);
 
+	/* Setup graphics library */
 	if (create_gfxenv(&gfxenv, window) == -1)
 	{
 		exit(EXIT_FAILURE);

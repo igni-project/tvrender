@@ -27,7 +27,6 @@ int create_gfxenv_gl(struct gfxenv *gfxenv, GLFWwindow *window)
 	GLuint vert_shader;
 	GLuint frag_shader;
 	GLuint program;
-	int gl_version;
 	GLenum error_code;
 
 	const char *home_dir;
@@ -52,11 +51,7 @@ int create_gfxenv_gl(struct gfxenv *gfxenv, GLFWwindow *window)
 	}
 
 	/* Load in the OpenGL library */
-	gl_version = gladLoadGL(glfwGetProcAddress);
-	if (gl_version == 0) {
-		printf("Failed to initialize OpenGL context\n");
-		return -1;
-	}
+	gladLoadGL();
 
 	/* Activate Z-buffering */
 	glEnable(GL_DEPTH_TEST);

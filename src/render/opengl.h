@@ -2,7 +2,8 @@
 #define RENDER_OPENGL_H 1
 
 #include <cglm/cglm.h>
-#include <glad/gl.h>
+/*#include <GL/gl.h>*/
+#include "../gl/include/glad/glad.h"
 #include <GLFW/glfw3.h>
 #include <xf86drm.h>
 #include <xf86drmMode.h>

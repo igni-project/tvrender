@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.1.4
++ Bundled GLAD headers with repository
+
 ## v0.1.3
 + Added support for TVrender protocol version 2
 + More memory fixes
